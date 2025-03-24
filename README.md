@@ -1,36 +1,88 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Marduk AEO
 
-## Getting Started
+Marduk AEO is an AI-enhanced SEO tool that helps brands monitor and optimize their presence in AI search results.
 
-First, run the development server:
+## Features
+
+- Brand management
+- Competitor tracking
+- Keyword query monitoring
+- Source influence analysis
+- Prompt template management
+- AI visibility optimization recommendations
+
+## Tech Stack
+
+- Next.js (App Router)
+- TypeScript
+- Tailwind CSS
+- Supabase (Database, Auth, Edge Functions)
+- Recharts for data visualization
+
+## Local Development
 
 ```bash
+# Install dependencies
+npm install
+
+# Set up environment variables
+# Create a .env.local file with your Supabase credentials
+
+# Start the development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Deployment on Vercel
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 1. Connect to Vercel
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Create a Vercel account if you don't have one
+2. Install the Vercel CLI: `npm i -g vercel`
+3. Login to Vercel: `vercel login`
 
-## Learn More
+### 2. Set Environment Variables
 
-To learn more about Next.js, take a look at the following resources:
+In your Vercel project settings, add the following environment variables:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+OPENAI_API_KEY=your-openai-key
+ANTHROPIC_API_KEY=your-anthropic-key
+GOOGLE_AI_API_KEY=your-google-ai-key
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 3. Deploy
 
-## Deploy on Vercel
+```bash
+# Deploy to Vercel
+vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# For production deployment
+vercel --prod
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Supabase Edge Functions
+
+For Supabase Edge Functions, you can deploy them directly from the Supabase CLI:
+
+```bash
+# Login to Supabase
+npx supabase login
+
+# Link your project
+npx supabase link --project-ref your-project-ref
+
+# Deploy an edge function
+npx supabase functions deploy prompt-templates
+```
+
+## Database Setup
+
+The project uses Supabase for the database. The schema is defined in the migrations folder.
+
+```bash
+# Apply migrations
+npx supabase db push
+```
