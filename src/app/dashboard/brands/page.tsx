@@ -19,7 +19,7 @@ interface Brand {
   industry?: string;
   business_model?: string;
   target_audience?: string;
-  unique_value_props?: Record<string, any>;
+  unique_value_props?: Record<string, string | number | boolean>;
   created_at?: string;
 }
 

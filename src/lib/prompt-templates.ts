@@ -14,12 +14,23 @@ export interface PromptTemplate {
   template_text: string;
   purpose: string;
   variables?: Record<string, PromptVariable>;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, string | number | boolean | object>;
   created_at?: string;
 }
 
 export interface TestCase {
-  [key: string]: any;
+  [key: string]: string | number | boolean | object;
+}
+
+// Define response types for better type safety
+export interface TemplateTestResult {
+  templateId: string;
+  testCaseId: string;
+  result: string;
+  tokens: number;
+  latency: number;
+  success: boolean;
+  error?: string;
 }
 
 // Initialize Supabase client
@@ -54,7 +65,7 @@ export const promptTemplateService = {
   /**
    * Test a prompt template with specific test cases
    */
-  async testTemplate(templateId: string, testCases: TestCase[], llmType: string = 'openai'): Promise<any> {
+  async testTemplate(templateId: string, testCases: TestCase[], llmType: string = 'openai'): Promise<TemplateTestResult[]> {
     try {
       const { data, error } = await supabase.functions.invoke('prompt-templates', {
         body: {
@@ -153,12 +164,12 @@ export const promptTemplateService = {
 /**
  * Process a template with variables
  */
-export function processTemplate(template: string, variables: Record<string, any>): string {
+export function processTemplate(template: string, variables: Record<string, string | number | boolean>): string {
   let processedTemplate = template;
   
   // Replace each variable placeholder with its value
   Object.entries(variables).forEach(([key, value]) => {
-    processedTemplate = processedTemplate.replace(new RegExp(`{${key}}`, 'g'), value);
+    processedTemplate = processedTemplate.replace(new RegExp(`{${key}}`, 'g'), String(value));
   });
   
   return processedTemplate;
