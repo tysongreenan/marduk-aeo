@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '../../components/auth/AuthProvider'
 import Link from 'next/link'
 
-// Define a Brand type
+// Define the Brand type
 interface Brand {
   id: string
   name: string
@@ -13,51 +13,39 @@ interface Brand {
 }
 
 export default function DashboardPage() {
-  const { user, isLoading, signOut } = useAuth()
+  const { user, isLoading } = useAuth()
   const router = useRouter()
   const [brands, setBrands] = useState<Brand[]>([])
-  const [loadingBrands, setLoadingBrands] = useState(true)
+  const [brandsLoading, setBrandsLoading] = useState(false)
 
   // Redirect to login if not authenticated
   useEffect(() => {
     if (!isLoading && !user) {
       router.push('/login')
+    } else if (user) {
+      // Fetch brands
+      const fetchBrands = async () => {
+        setBrandsLoading(true)
+        try {
+          // This would be replaced with a real API call
+          // e.g., const { data } = await fetch('/api/brands')
+          const mockBrands = [
+            { id: '1', name: 'Example Brand', industry: 'Technology' },
+            { id: '2', name: 'Test Company', industry: 'Retail' },
+          ]
+          setBrands(mockBrands)
+        } catch (error) {
+          console.error('Failed to fetch brands')
+        } finally {
+          setBrandsLoading(false)
+        }
+      }
+      
+      fetchBrands()
     }
   }, [user, isLoading, router])
 
-  // Fetch brands when user is authenticated
-  useEffect(() => {
-    const fetchBrands = async () => {
-      if (user) {
-        try {
-          // Fetch brands using server actions (to be implemented)
-          // const userBrands = await getBrands(user.id)
-          // setBrands(userBrands)
-          
-          // Temporary placeholder data
-          setBrands([
-            { id: '1', name: 'Sample Brand 1', industry: 'Technology' },
-            { id: '2', name: 'Sample Brand 2', industry: 'Healthcare' }
-          ])
-          setLoadingBrands(false)
-        } catch (error) {
-          console.error('Error fetching brands:', error)
-          setLoadingBrands(false)
-        }
-      }
-    }
-
-    if (user) {
-      fetchBrands()
-    }
-  }, [user])
-
-  const handleSignOut = async () => {
-    await signOut()
-    router.push('/login')
-  }
-
-  // Show loading while checking authentication
+  // Show loading state while checking authentication
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -66,75 +54,57 @@ export default function DashboardPage() {
     )
   }
 
-  // User should be redirected if not authenticated, but this is a fallback
-  if (!user) {
-    return null
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow">
-        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 flex justify-between items-center">
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Dashboard</h1>
-          <div>
-            <span className="mr-4 text-sm">{user.email}</span>
-            <button
-              onClick={handleSignOut}
-              className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500"
-            >
-              Sign out
-            </button>
-          </div>
+    <div>
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold mb-2">Dashboard</h1>
+        <p className="text-gray-600">Welcome to your Marduk AEO dashboard.</p>
+      </div>
+      
+      {user && (
+        <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <h2 className="text-lg font-semibold mb-4">Your Account</h2>
+          <p>Signed in as: <span className="font-medium">{user.email}</span></p>
         </div>
-      </header>
-
-      {/* Main content */}
-      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-4">Your Brands</h2>
-          
-          {loadingBrands ? (
-            <p>Loading brands...</p>
-          ) : brands.length === 0 ? (
-            <div className="text-center py-6">
-              <p className="mb-4">You haven't added any brands yet.</p>
+      )}
+      
+      <div className="bg-white rounded-lg shadow p-6">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-semibold">Your Brands</h2>
+          <Link
+            href="/dashboard/brands/new"
+            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-500 text-sm font-medium"
+          >
+            Add Brand
+          </Link>
+        </div>
+        
+        {brandsLoading ? (
+          <p>Loading brands...</p>
+        ) : brands.length > 0 ? (
+          <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+            {brands.map((brand) => (
               <Link
-                href="/brands/new"
-                className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500"
+                key={brand.id}
+                href={`/dashboard/brands/${brand.id}`}
+                className="block p-4 border rounded-md hover:border-indigo-300 hover:bg-indigo-50"
               >
-                Add Your First Brand
+                <h3 className="font-medium">{brand.name}</h3>
+                {brand.industry && (
+                  <p className="text-sm text-gray-500">{brand.industry}</p>
+                )}
               </Link>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {brands.map((brand) => (
-                <div key={brand.id} className="border rounded-lg p-4 hover:shadow-md transition">
-                  <h3 className="font-medium text-lg">{brand.name}</h3>
-                  <p className="text-gray-500">{brand.industry}</p>
-                  <div className="mt-4">
-                    <Link
-                      href={`/brands/${brand.id}`}
-                      className="text-indigo-600 hover:text-indigo-900 font-medium"
-                    >
-                      View Details
-                    </Link>
-                  </div>
-                </div>
-              ))}
-              
-              <div className="border rounded-lg p-4 flex items-center justify-center hover:shadow-md transition border-dashed">
-                <Link
-                  href="/brands/new"
-                  className="text-indigo-600 hover:text-indigo-900 font-medium flex items-center"
-                >
-                  <span className="mr-2 text-xl">+</span> Add New Brand
-                </Link>
-              </div>
-            </div>
-          )}
-        </div>
-      </main>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-8">
+            <p className="text-gray-500 mb-4">You don&apos;t have any brands yet.</p>
+            <p className="text-sm text-gray-400">
+              Add your first brand to start tracking its presence in AI search results.
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   )
 } 

@@ -3,7 +3,7 @@ import { createBrowserClient, getEdgeFunctionUrl } from './client'
 /**
  * Generic type for Edge Function requests
  */
-export interface EdgeFunctionRequest<T = Record<string, any>> {
+export interface EdgeFunctionRequest<T = Record<string, unknown>> {
   method: string;
   body: T;
 }
@@ -11,7 +11,7 @@ export interface EdgeFunctionRequest<T = Record<string, any>> {
 /**
  * Generic type for Edge Function responses
  */
-export interface EdgeFunctionResponse<T = Record<string, any>> {
+export interface EdgeFunctionResponse<T = Record<string, unknown>> {
   data: T | null;
   error: string | null;
 }

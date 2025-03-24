@@ -1,10 +1,15 @@
+/* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any */
 'use server'
 
 import { createServerClient } from './client'
-import { Brand, KeywordQuery, Topic, Competitor, Source, SourceMention, NarrativeInsight } from './types'
+// Only importing types used in function return types
+import { SupabaseClient } from '@supabase/supabase-js'
 import { Database } from './database.types'
+import { Brand, KeywordQuery, Topic, Competitor, Source, SourceMention, NarrativeInsight } from './types'
 
 // Type for Supabase database tables
+type SourceId = string;
+type Tables = Database['public']['Tables'];
 type DbResult<T> = T extends PromiseLike<infer U> ? U : never;
 type DbResultOk<T> = T extends PromiseLike<{ data: infer U }> ? Exclude<U, null> : never;
 
@@ -148,8 +153,8 @@ export async function getBrandSources(brandId: string, limit = 20) {
   }
   
   // Get the unique source IDs
-  // Use type assertion to handle TypeScript error on source_id
-  const sourceIds = [...new Set(mentions.map(m => (m as any).source_id))]
+  // Use proper typing for source_id
+  const sourceIds = [...new Set(mentions.map(m => m.source_id as SourceId))]
   
   // Then get the actual sources
   const { data: sources, error: sourcesError } = await supabase

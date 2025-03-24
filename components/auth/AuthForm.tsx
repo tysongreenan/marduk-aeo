@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { createBrowserClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 
 export default function AuthForm() {
   const [email, setEmail] = useState('')
@@ -36,8 +35,12 @@ export default function AuthForm() {
         if (error) throw error
         router.push('/dashboard')
       }
-    } catch (error: any) {
-      setMessage(error.message)
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setMessage(error.message)
+      } else {
+        setMessage('An unexpected error occurred')
+      }
     } finally {
       setLoading(false)
     }
