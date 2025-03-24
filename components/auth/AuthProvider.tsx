@@ -1,118 +1,168 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState } from 'react'
-import { createBrowserClient } from '../../src/lib/supabase/client'
-import { Session, User, AuthError, AuthChangeEvent } from '@supabase/supabase-js'
+import { User, Session, AuthChangeEvent } from '@supabase/supabase-js'
+import { createBrowserClient } from '@/lib/supabase/client'
 
-// Create context
+// Define auth context type with improved error handling
 interface AuthContextType {
   user: User | null
-  isLoading: boolean
+  loading: boolean
+  error: Error | null
   isEnvironmentReady: boolean
-  signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>
-  signUp: (email: string, password: string) => Promise<{ error: AuthError | null }>
+  signIn: (email: string, password: string) => Promise<{ error: Error | null }>
+  signUp: (email: string, password: string) => Promise<{ error: Error | null }>
   signOut: () => Promise<void>
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+// Create auth context with default values
+const AuthContext = createContext<AuthContextType>({
+  user: null,
+  loading: true,
+  error: null,
+  isEnvironmentReady: false,
+  signIn: async () => ({ error: new Error('AuthContext not initialized') }),
+  signUp: async () => ({ error: new Error('AuthContext not initialized') }),
+  signOut: async () => {},
+})
 
-// Provider component
+// Check if environment is properly configured
+const checkEnvironment = () => {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  if (!url || !key) {
+    console.error('Missing required environment variables for authentication')
+    return false
+  }
+
+  try {
+    new URL(url) // Validate URL format
+    if (!key.match(/^ey[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$/)) {
+      console.error('Invalid NEXT_PUBLIC_SUPABASE_ANON_KEY format')
+      return false
+    }
+    return true
+  } catch (e) {
+    console.error('Invalid NEXT_PUBLIC_SUPABASE_URL format:', url)
+    return false
+  }
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
   const [isEnvironmentReady, setIsEnvironmentReady] = useState(false)
-  
-  // Check if environment variables are set
+
   useEffect(() => {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    
-    setIsEnvironmentReady(!!supabaseUrl && !!supabaseAnonKey)
-  }, [])
-  
-  // Initialize Supabase client and set up auth state listener
-  useEffect(() => {
-    if (!isEnvironmentReady) {
-      setIsLoading(false)
+    // Check environment configuration
+    const envReady = checkEnvironment()
+    setIsEnvironmentReady(envReady)
+    if (!envReady) {
+      setError(new Error('Authentication environment not properly configured'))
+      setLoading(false)
       return
     }
-    
+
+    // Initialize Supabase client
     const supabase = createBrowserClient()
-    
-    // Set initial user
-    const initUser = async () => {
+
+    // Get initial session
+    const initSession = async () => {
       try {
-        const { data } = await supabase.auth.getSession()
-        setUser(data.session?.user || null)
-      } catch (error) {
-        console.error('Error getting session:', error)
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+        if (sessionError) throw sessionError
+        setUser(session?.user ?? null)
+      } catch (e) {
+        console.error('Error getting initial session:', e)
+        setError(e instanceof Error ? e : new Error('Unknown error during session initialization'))
       } finally {
-        setIsLoading(false)
+        setLoading(false)
       }
     }
 
-    initUser()
-
-    // Listen for auth changes
+    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event: AuthChangeEvent, session: Session | null) => {
-        setUser(session?.user || null)
+      (event: AuthChangeEvent, session: Session | null) => {
+        setUser(session?.user ?? null)
+        setError(null) // Clear any previous errors on successful auth state change
       }
     )
 
-    // Cleanup on unmount
+    initSession()
+
     return () => {
       subscription.unsubscribe()
     }
-  }, [isEnvironmentReady])
+  }, [])
 
-  // Sign in function
   const signIn = async (email: string, password: string) => {
     if (!isEnvironmentReady) {
-      return { error: new Error('Supabase environment not configured') as unknown as AuthError }
+      return { error: new Error('Authentication environment not properly configured') }
     }
-    
-    const supabase = createBrowserClient()
-    return await supabase.auth.signInWithPassword({ email, password })
+
+    try {
+      const supabase = createBrowserClient()
+      const { error } = await supabase.auth.signInWithPassword({ email, password })
+      if (error) throw error
+      return { error: null }
+    } catch (e) {
+      console.error('Sign in error:', e)
+      return { error: e instanceof Error ? e : new Error('Unknown error during sign in') }
+    }
   }
-  
-  // Sign up function
+
   const signUp = async (email: string, password: string) => {
     if (!isEnvironmentReady) {
-      return { error: new Error('Supabase environment not configured') as unknown as AuthError }
+      return { error: new Error('Authentication environment not properly configured') }
     }
-    
-    const supabase = createBrowserClient()
-    return await supabase.auth.signUp({ email, password })
+
+    try {
+      const supabase = createBrowserClient()
+      const { error } = await supabase.auth.signUp({ email, password })
+      if (error) throw error
+      return { error: null }
+    } catch (e) {
+      console.error('Sign up error:', e)
+      return { error: e instanceof Error ? e : new Error('Unknown error during sign up') }
+    }
   }
-  
-  // Sign out function
+
   const signOut = async () => {
     if (!isEnvironmentReady) {
+      console.warn('Cannot sign out - authentication environment not properly configured')
       return
     }
-    
-    const supabase = createBrowserClient()
-    await supabase.auth.signOut()
+
+    try {
+      const supabase = createBrowserClient()
+      await supabase.auth.signOut()
+    } catch (e) {
+      console.error('Sign out error:', e)
+      setError(e instanceof Error ? e : new Error('Unknown error during sign out'))
+    }
   }
 
-  // Context value
-  const value = {
-    user,
-    isLoading,
-    isEnvironmentReady,
-    signIn,
-    signUp,
-    signOut
-  }
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+  return (
+    <AuthContext.Provider value={{
+      user,
+      loading,
+      error,
+      isEnvironmentReady,
+      signIn,
+      signUp,
+      signOut,
+    }}>
+      {children}
+    </AuthContext.Provider>
+  )
 }
 
-// Custom hook to use the auth context
-export const useAuth = () => {
+// Custom hook to use auth context with proper error handling
+export function useAuth() {
   const context = useContext(AuthContext)
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useAuth must be used within an AuthProvider')
   }
   return context

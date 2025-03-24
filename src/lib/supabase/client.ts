@@ -1,17 +1,111 @@
 import { createClient } from '@supabase/supabase-js'
 import { Database } from './database.types'
 
-// Safe environment variable access
+// Safe environment variable access with validation
 const getSupabaseUrl = () => {
-  return process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  if (!url) {
+    console.warn('NEXT_PUBLIC_SUPABASE_URL is not set')
+    return ''
+  }
+  // Validate URL format
+  try {
+    new URL(url)
+    return url
+  } catch (e) {
+    console.error('Invalid NEXT_PUBLIC_SUPABASE_URL format:', url)
+    return ''
+  }
 }
 
 const getAnonKey = () => {
-  return process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  if (!key) {
+    console.warn('NEXT_PUBLIC_SUPABASE_ANON_KEY is not set')
+    return ''
+  }
+  // Basic key format validation
+  if (!key.match(/^ey[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$/)) {
+    console.error('Invalid NEXT_PUBLIC_SUPABASE_ANON_KEY format')
+    return ''
+  }
+  return key
 }
 
 const getServiceRoleKey = () => {
-  return process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!key) {
+    console.warn('SUPABASE_SERVICE_ROLE_KEY is not set')
+    return ''
+  }
+  // Basic key format validation
+  if (!key.match(/^ey[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$/)) {
+    console.error('Invalid SUPABASE_SERVICE_ROLE_KEY format')
+    return ''
+  }
+  return key
+}
+
+// Mock client factory with improved error handling
+const createMockClient = (clientType: 'server' | 'browser') => {
+  const errorMessage = `Supabase ${clientType} client not initialized - environment variables missing or invalid`
+  
+  return {
+    from: () => ({
+      select: () => ({
+        eq: () => ({
+          order: () => ({
+            limit: () => ({
+              data: [],
+              error: new Error(errorMessage)
+            }),
+            data: [],
+            error: new Error(errorMessage)
+          }),
+          limit: () => ({
+            data: [],
+            error: new Error(errorMessage)
+          }),
+          single: () => ({
+            data: null,
+            error: new Error(errorMessage)
+          }),
+          data: [],
+          error: new Error(errorMessage)
+        }),
+        in: () => ({
+          data: [],
+          error: new Error(errorMessage)
+        }),
+        data: [],
+        error: new Error(errorMessage)
+      })
+    }),
+    auth: {
+      getSession: async () => ({ 
+        data: { session: null },
+        error: new Error(errorMessage)
+      }),
+      signInWithPassword: async () => ({
+        data: { session: null },
+        error: new Error(errorMessage)
+      }),
+      signUp: async () => ({
+        data: { session: null },
+        error: new Error(errorMessage)
+      }),
+      signOut: async () => {},
+      onAuthStateChange: () => ({
+        data: { subscription: { unsubscribe: () => {} } }
+      })
+    },
+    functions: {
+      invoke: async () => ({
+        data: null,
+        error: new Error(errorMessage)
+      })
+    }
+  } as any
 }
 
 /**
@@ -21,55 +115,19 @@ const getServiceRoleKey = () => {
  * @returns Typed Supabase client with service role permissions
  */
 export const createServerClient = () => {
-  // If environment variables aren't available (during build), return a mock client
-  if (!getSupabaseUrl() || !getServiceRoleKey()) {
-    console.warn('Missing Supabase environment variables for server client')
-    // Return a dummy client during build
-    return {
-      from: () => ({
-        select: () => ({
-          eq: () => ({
-            order: () => ({
-              limit: () => ({
-                data: [],
-                error: null
-              }),
-              data: [],
-              error: null
-            }),
-            limit: () => ({
-              data: [],
-              error: null
-            }),
-            single: () => ({
-              data: null,
-              error: null
-            }),
-            data: [],
-            error: null
-          }),
-          in: () => ({
-            data: [],
-            error: null
-          }),
-          data: [],
-          error: null
-        })
-      }),
-      auth: {
-        getSession: async () => ({ data: { session: null } }),
-        signOut: async () => {},
-      },
-      functions: {
-        invoke: async () => ({ data: null, error: null })
-      }
-    } as any
+  const url = getSupabaseUrl()
+  const serviceKey = getServiceRoleKey()
+
+  if (!url || !serviceKey) {
+    return createMockClient('server')
   }
 
-  return createClient<Database>(
-    getSupabaseUrl(),
-    getServiceRoleKey()
-  )
+  try {
+    return createClient<Database>(url, serviceKey)
+  } catch (error) {
+    console.error('Error creating Supabase server client:', error)
+    return createMockClient('server')
+  }
 }
 
 /**
@@ -79,38 +137,19 @@ export const createServerClient = () => {
  * @returns Typed Supabase client with anonymous permissions
  */
 export const createBrowserClient = () => {
-  // If environment variables aren't available (during build), return a mock client
-  if (!getSupabaseUrl() || !getAnonKey()) {
-    console.warn('Missing Supabase environment variables for browser client')
-    // Return a dummy client during build
-    return {
-      from: () => ({
-        select: () => ({
-          eq: () => ({
-            data: [],
-            error: null
-          }),
-          data: [],
-          error: null
-        })
-      }),
-      auth: {
-        getSession: async () => ({ data: { session: null } }),
-        signInWithPassword: async () => ({ data: { session: null }, error: null }),
-        signUp: async () => ({ data: { session: null }, error: null }),
-        signOut: async () => {},
-        onAuthStateChange: async () => ({ data: { subscription: { unsubscribe: () => {} } } })
-      },
-      functions: {
-        invoke: async () => ({ data: null, error: null })
-      }
-    } as any
+  const url = getSupabaseUrl()
+  const anonKey = getAnonKey()
+
+  if (!url || !anonKey) {
+    return createMockClient('browser')
   }
 
-  return createClient<Database>(
-    getSupabaseUrl(),
-    getAnonKey()
-  )
+  try {
+    return createClient<Database>(url, anonKey)
+  } catch (error) {
+    console.error('Error creating Supabase browser client:', error)
+    return createMockClient('browser')
+  }
 }
 
 /**
@@ -120,8 +159,9 @@ export const createBrowserClient = () => {
  */
 export const getEdgeFunctionUrl = () => {
   const url = getSupabaseUrl()
-  // Return a safe value if URL is not available during build
-  if (!url) return ''
-  // Convert from https://project-ref.supabase.co to https://project-ref.supabase.co/functions/v1
+  if (!url) {
+    console.warn('Cannot generate Edge Function URL - NEXT_PUBLIC_SUPABASE_URL is not set')
+    return ''
+  }
   return `${url}/functions/v1`
 } 
