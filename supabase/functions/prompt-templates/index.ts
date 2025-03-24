@@ -8,10 +8,43 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-interface RequestPayload {
-  method: string;
-  body: any;
+// Define template properties
+interface PromptVariable {
+  type: string;
+  required: boolean;
+  description?: string;
 }
+
+interface PromptTemplate {
+  name: string;
+  version: string;
+  template_text: string;
+  purpose: string;
+  variables?: Record<string, PromptVariable>;
+  metadata?: Record<string, string | number | boolean | object>;
+}
+
+interface TestCase {
+  [key: string]: string | number | boolean | object;
+}
+
+// Define specific request types
+interface CreateTemplateRequest {
+  method: 'create';
+  body: PromptTemplate;
+}
+
+interface TestTemplateRequest {
+  method: 'test';
+  body: {
+    template_id: string;
+    test_cases: TestCase[];
+    llm_type?: string;
+  };
+}
+
+// Combined request type
+type RequestPayload = CreateTemplateRequest | TestTemplateRequest;
 
 serve(async (req: Request) => {
   // Handle CORS preflight request
@@ -30,10 +63,11 @@ serve(async (req: Request) => {
       { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
     )
 
-    const { method, body }: RequestPayload = await req.json()
+    const payload = await req.json() as RequestPayload;
+    const { method, body } = payload;
 
     if (method === 'create') {
-      const { name, version, template_text, purpose, variables, metadata } = body
+      const { name, version, template_text, purpose, variables, metadata } = body;
       
       const { data, error } = await supabaseClient
         .from('prompt_templates')
@@ -49,7 +83,7 @@ serve(async (req: Request) => {
       })
       
     } else if (method === 'test') {
-      const { template_id, test_cases, llm_type } = body
+      const { template_id, test_cases, llm_type = 'openai' } = body;
       
       // Get the template
       const { data: template, error } = await supabaseClient
@@ -62,8 +96,17 @@ serve(async (req: Request) => {
       
       // Test code would go here - in a real implementation
       // this would call OpenAI, Anthropic, etc. with the template
+      // For now, just return mock results
+      const results = test_cases.map((testCase, index) => ({
+        templateId: template_id,
+        testCaseId: `test-${index}`,
+        result: `Mock response for test case ${index}`,
+        tokens: 150,
+        latency: 500,
+        success: true
+      }));
       
-      return new Response(JSON.stringify({ success: true }), {
+      return new Response(JSON.stringify({ results }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
       })
