@@ -1,23 +1,50 @@
-# Marduk AEO
+# Marduk AEO Platform
 
-Marduk AEO is an AI-enhanced SEO tool that helps brands monitor and optimize their presence in AI search results.
+Answer Engine Optimization Platform for tracking brand visibility in AI-powered search results.
 
 ## Features
 
-- Brand management
-- Competitor tracking
-- Keyword query monitoring
-- Source influence analysis
-- Prompt template management
-- AI visibility optimization recommendations
+- **Brand Management**: Track brands and competitors
+- **Keyword Tracking**: Monitor keywords and phrases in AI search results
+- **Source Influence**: Analyze source influence on AI-generated answers
+- **Narrative Analysis**: Identify and shape narratives about your brand
 
-## Tech Stack
+## Getting Started
 
-- Next.js (App Router)
-- TypeScript
-- Tailwind CSS
-- Supabase (Database, Auth, Edge Functions)
-- Recharts for data visualization
+### Environment Variables
+
+1. Copy `.env.example` to `.env.local`:
+```bash
+cp .env.example .env.local
+```
+
+2. Update the values in `.env.local` with your Supabase credentials:
+   - `NEXT_PUBLIC_SUPABASE_URL`: Your Supabase project URL
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Public anon key from Supabase
+   - `SUPABASE_SERVICE_ROLE_KEY`: Service role key for server operations (keep secret!)
+
+You can find these credentials in your Supabase dashboard under Project Settings > API.
+
+### Installation
+
+```bash
+# Install dependencies
+npm install
+
+# Run the development server
+npm run dev
+```
+
+### Deployment
+
+For deployment on Vercel, add the environment variables to your project settings.
+
+## Technology Stack
+
+- Next.js for the frontend and API routes
+- Supabase for database, auth, and edge functions
+- TypeScript for type safety
+- Tailwind CSS for styling
 
 ## Local Development
 

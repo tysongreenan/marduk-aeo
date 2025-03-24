@@ -1,87 +1,109 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '../components/auth/AuthProvider'
 import Link from 'next/link'
 
 export default function HomePage() {
-  const { user, isLoading } = useAuth()
+  const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
+  const { user } = useAuth()
 
-  // Redirect to dashboard if already authenticated
   useEffect(() => {
-    if (!isLoading && user) {
+    // Redirect authenticated users to dashboard
+    if (user) {
       router.push('/dashboard')
+    } else {
+      setIsLoading(false)
     }
-  }, [user, isLoading, router])
+  }, [user, router])
 
-  // Show loading state while checking authentication
+  // Show loading state
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <p className="text-lg">Loading...</p>
+        <p className="text-lg text-gray-600">Loading...</p>
       </div>
     )
   }
 
-  // Landing page for non-authenticated users
   return (
-    <div className="relative isolate overflow-hidden bg-gray-900 min-h-screen">
-      <div className="absolute inset-0 -z-10 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-indigo-900 via-gray-900 to-black opacity-80"></div>
-      </div>
-      
-      <div className="px-6 py-12 sm:px-6 sm:py-32 lg:px-8">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-4xl font-bold tracking-tight text-white sm:text-6xl">
-            Marduk AEO Platform
-          </h2>
-          <p className="mt-6 text-lg leading-8 text-gray-300">
-            Optimize your brand&apos;s visibility in AI-powered search engines and answer platforms.
-          </p>
-          <div className="mt-10 flex items-center justify-center gap-x-6">
-            <Link
-              href="/login"
-              className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-            >
-              Log in
-            </Link>
-            <Link
-              href="/signup"
-              className="text-sm font-semibold leading-6 text-white"
-            >
-              Sign up <span aria-hidden="true">→</span>
-            </Link>
-          </div>
-        </div>
-      </div>
-      
-      <div className="absolute inset-x-0 top-0 z-50">
-        <div className="mx-auto max-w-7xl px-6 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex lg:flex-1">
-              <Link href="/" className="text-white font-bold text-xl">
-                Marduk AEO
-              </Link>
+    <div className="flex flex-col min-h-screen">
+      {/* Navigation */}
+      <nav className="bg-white shadow">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            <div className="flex-shrink-0 flex items-center">
+              <span className="text-2xl font-bold text-primary-600">Marduk AEO</span>
             </div>
-            <div className="flex gap-x-6">
-              <Link
-                href="/login"
-                className="text-sm font-semibold leading-6 text-white"
+            <div className="flex items-center space-x-4">
+              <Link 
+                href="/login" 
+                className="px-4 py-2 text-sm font-medium text-primary-600 hover:text-primary-500"
               >
                 Log in
               </Link>
-              <Link
-                href="/signup"
-                className="text-sm font-semibold leading-6 text-white"
+              <Link 
+                href="/signup" 
+                className="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-md hover:bg-primary-500"
               >
-                Sign up <span aria-hidden="true">→</span>
+                Sign up
               </Link>
             </div>
           </div>
         </div>
-      </div>
+      </nav>
+
+      {/* Hero section */}
+      <main className="flex-grow">
+        <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8">
+          <div className="lg:grid lg:grid-cols-12 lg:gap-8">
+            <div className="sm:text-center md:max-w-2xl md:mx-auto lg:col-span-6 lg:text-left">
+              <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl md:text-6xl">
+                <span className="block">Monitor your brand in</span>
+                <span className="block text-primary-600">AI search results</span>
+              </h1>
+              <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto lg:mx-0">
+                Track your brand's visibility in AI-powered search engines like Claude, ChatGPT, and more. Gain insights into mentions, sentiment, and get ahead of potential issues.
+              </p>
+              <div className="mt-8 sm:max-w-lg sm:mx-auto sm:text-center lg:text-left">
+                <Link 
+                  href="/signup" 
+                  className="px-6 py-3 text-base font-medium text-white bg-primary-600 rounded-md hover:bg-primary-500 inline-flex items-center"
+                >
+                  Start tracking your brand
+                  <svg className="ml-2 -mr-1 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </Link>
+              </div>
+            </div>
+            <div className="mt-12 relative sm:max-w-lg sm:mx-auto lg:mt-0 lg:max-w-none lg:mx-0 lg:col-span-6 lg:flex lg:items-center">
+              <div className="relative mx-auto w-full rounded-lg shadow-lg lg:max-w-md">
+                <div className="relative block w-full bg-gray-100 rounded-lg overflow-hidden">
+                  <div className="p-8 text-center">
+                    <svg className="mx-auto h-12 w-12 text-primary-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    <p className="mt-4 text-lg font-medium text-gray-900">Track Your AI Visibility</p>
+                    <p className="mt-2 text-sm text-gray-500">See how your brand is mentioned in AI-powered search results, track competitor mentions, and analyze sentiment.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-gray-50">
+        <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+          <p className="text-center text-sm text-gray-500">
+            &copy; {new Date().getFullYear()} Marduk AEO. All rights reserved.
+          </p>
+        </div>
+      </footer>
     </div>
   )
 } 

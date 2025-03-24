@@ -1,89 +1,116 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState } from 'react'
-import { Session, User } from '@supabase/supabase-js'
-import { createBrowserClient } from '@/lib/supabase/client'
+import { createBrowserClient } from '../../src/lib/supabase/client'
+import { Session, User, AuthError, AuthChangeEvent } from '@supabase/supabase-js'
 
-// Create auth context
-type AuthContextType = {
+// Create context
+interface AuthContextType {
   user: User | null
-  session: Session | null
   isLoading: boolean
-  signIn: (email: string, password: string) => Promise<{ error: Error | null }>
-  signUp: (email: string, password: string) => Promise<{ error: Error | null }>
+  isEnvironmentReady: boolean
+  signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>
+  signUp: (email: string, password: string) => Promise<{ error: AuthError | null }>
   signOut: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-// Auth provider component
+// Provider component
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [session, setSession] = useState<Session | null>(null)
   const [user, setUser] = useState<User | null>(null)
-  const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isEnvironmentReady, setIsEnvironmentReady] = useState(false)
   
-  // Initialize the Supabase client
-  const supabase = createBrowserClient()
-  
-  // Check for session on mount and setup listener
+  // Check if environment variables are set
   useEffect(() => {
-    const setupAuth = async () => {
-      // Get initial session
-      const { data: { session: initialSession } } = await supabase.auth.getSession()
-      setSession(initialSession)
-      setUser(initialSession?.user ?? null)
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    
+    setIsEnvironmentReady(!!supabaseUrl && !!supabaseAnonKey)
+  }, [])
+  
+  // Initialize Supabase client and set up auth state listener
+  useEffect(() => {
+    if (!isEnvironmentReady) {
       setIsLoading(false)
-      
-      // Listen for auth changes
-      const { data: { subscription } } = await supabase.auth.onAuthStateChange(
-        (_event, newSession) => {
-          setSession(newSession)
-          setUser(newSession?.user ?? null)
-        }
-      )
-      
-      // Cleanup on unmount
-      return () => {
-        subscription.unsubscribe()
-      }
+      return
     }
     
-    setupAuth()
-  }, [supabase.auth])
-  
-  // Auth methods
+    const supabase = createBrowserClient()
+    
+    // Set initial user
+    const initUser = async () => {
+      try {
+        const { data } = await supabase.auth.getSession()
+        setUser(data.session?.user || null)
+      } catch (error) {
+        console.error('Error getting session:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    initUser()
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event: AuthChangeEvent, session: Session | null) => {
+        setUser(session?.user || null)
+      }
+    )
+
+    // Cleanup on unmount
+    return () => {
+      subscription.unsubscribe()
+    }
+  }, [isEnvironmentReady])
+
+  // Sign in function
   const signIn = async (email: string, password: string) => {
-    setIsLoading(true)
-    const result = await supabase.auth.signInWithPassword({ email, password })
-    setIsLoading(false)
-    return { error: result.error }
+    if (!isEnvironmentReady) {
+      return { error: new Error('Supabase environment not configured') as unknown as AuthError }
+    }
+    
+    const supabase = createBrowserClient()
+    return await supabase.auth.signInWithPassword({ email, password })
   }
   
+  // Sign up function
   const signUp = async (email: string, password: string) => {
-    setIsLoading(true)
-    const result = await supabase.auth.signUp({ email, password })
-    setIsLoading(false)
-    return { error: result.error }
+    if (!isEnvironmentReady) {
+      return { error: new Error('Supabase environment not configured') as unknown as AuthError }
+    }
+    
+    const supabase = createBrowserClient()
+    return await supabase.auth.signUp({ email, password })
   }
   
+  // Sign out function
   const signOut = async () => {
+    if (!isEnvironmentReady) {
+      return
+    }
+    
+    const supabase = createBrowserClient()
     await supabase.auth.signOut()
   }
-  
+
+  // Context value
   const value = {
     user,
-    session,
     isLoading,
+    isEnvironmentReady,
     signIn,
     signUp,
     signOut
   }
-  
+
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 
-// Custom hook to use auth context
-export function useAuth() {
+// Custom hook to use the auth context
+export const useAuth = () => {
   const context = useContext(AuthContext)
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider')
