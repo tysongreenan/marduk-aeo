@@ -12,7 +12,7 @@ const getSupabaseUrl = () => {
   try {
     new URL(url)
     return url
-  } catch (e) {
+  } catch (error) {
     console.error('Invalid NEXT_PUBLIC_SUPABASE_URL format:', url)
     return ''
   }
@@ -54,26 +54,6 @@ const createMockClient = (clientType: 'server' | 'browser') => {
     from: () => ({
       select: () => ({
         eq: () => ({
-          order: () => ({
-            limit: () => ({
-              data: [],
-              error: new Error(errorMessage)
-            }),
-            data: [],
-            error: new Error(errorMessage)
-          }),
-          limit: () => ({
-            data: [],
-            error: new Error(errorMessage)
-          }),
-          single: () => ({
-            data: null,
-            error: new Error(errorMessage)
-          }),
-          data: [],
-          error: new Error(errorMessage)
-        }),
-        in: () => ({
           data: [],
           error: new Error(errorMessage)
         }),
@@ -105,7 +85,7 @@ const createMockClient = (clientType: 'server' | 'browser') => {
         error: new Error(errorMessage)
       })
     }
-  } as any
+  } as any // This is acceptable for mock client during build
 }
 
 /**
