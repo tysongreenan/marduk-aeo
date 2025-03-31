@@ -1332,10 +1332,10 @@ async def get_cost_forecast(days: int = 30):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/set-budget")
-async def set_budget(settings: BudgetSettings):
+async def set_budget(settings: UsageSettings):
     """Set or update budget settings"""
     try:
-        result = await budget_manager.set_budget(settings)
+        result = await usage_manager.set_usage_alert(settings)
         return result
     except Exception as e:
         logger.error(f"Error setting budget: {e}")
@@ -1345,7 +1345,7 @@ async def set_budget(settings: BudgetSettings):
 async def get_budget():
     """Get current budget settings"""
     try:
-        settings = await budget_manager.get_budget_settings()
+        settings = await usage_manager.get_usage_settings()
         return settings
     except Exception as e:
         logger.error(f"Error getting budget settings: {e}")

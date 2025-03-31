@@ -8,6 +8,11 @@ load_dotenv()
 # Ensure Redis URL is properly formatted
 redis_url = os.getenv("REDIS_URL")
 if redis_url:
+    # Remove redis-cli -u prefix if present
+    if 'redis-cli -u ' in redis_url:
+        redis_url = redis_url.replace('redis-cli -u ', '')
+        print(f"Removed 'redis-cli -u' prefix from Redis URL")
+    
     # Ensure the URL starts with redis:// protocol
     if not (redis_url.startswith("redis://") or redis_url.startswith("rediss://") or redis_url.startswith("unix://")):
         corrected_url = f"redis://{redis_url}"
