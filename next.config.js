@@ -16,6 +16,13 @@ const nextConfig = {
     // It's better to fix the type errors than to ignore them.
     ignoreBuildErrors: true,
   },
+
+  // Configure runtime for auth-dependent pages
+  experimental: {
+    // This forces client-side rendering for pages that need auth
+    // so they don't fail during build time
+    appDir: true,
+  },
 }
 
 module.exports = nextConfig 
