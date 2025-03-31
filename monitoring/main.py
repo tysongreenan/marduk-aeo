@@ -83,7 +83,9 @@ scheduler = AsyncIOScheduler(
 )
 
 # Initialize Redis client
-redis = aioredis.from_url(os.getenv("REDIS_URL", "redis://localhost:6379"))
+redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
+print(f"Using Redis URL: {redis_url}")
+redis = aioredis.from_url(redis_url)
 
 # Pydantic models
 class MonitoringTask(BaseModel):

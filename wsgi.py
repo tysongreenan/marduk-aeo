@@ -5,6 +5,22 @@ from dotenv import load_dotenv
 # Load environment variables before importing app
 load_dotenv()
 
+# Ensure Redis URL is properly formatted
+redis_url = os.getenv("REDIS_URL")
+if redis_url:
+    # Ensure the URL starts with redis:// protocol
+    if not (redis_url.startswith("redis://") or redis_url.startswith("rediss://") or redis_url.startswith("unix://")):
+        corrected_url = f"redis://{redis_url}"
+        print(f"Warning: Fixed Redis URL format: {corrected_url}")
+        os.environ["REDIS_URL"] = corrected_url
+    else:
+        # Strip any whitespace
+        os.environ["REDIS_URL"] = redis_url.strip()
+    
+    print(f"Redis URL set to: {os.environ['REDIS_URL']}")
+else:
+    print("Warning: REDIS_URL environment variable not found")
+
 # Create a custom wrapper for importing app
 try:
     # Try the standard import first
