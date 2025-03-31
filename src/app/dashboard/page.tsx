@@ -117,4 +117,7 @@ function getActivityTypeLabel(type: string): string {
     default:
       return type;
   }
-} 
+}
+
+// Add this line at the end of the file to force dynamic rendering
+export const dynamic = 'force-dynamic'; 

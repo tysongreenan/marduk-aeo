@@ -17,12 +17,11 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
 
-  // Configure runtime for auth-dependent pages
+  // Disable static generation for auth/protected pages
   experimental: {
-    // This forces client-side rendering for pages that need auth
-    // so they don't fail during build time
-    appDir: true,
-  },
+    // Disable static generation during build
+    disableStaticGeneration: true
+  }
 }
 
 module.exports = nextConfig 
