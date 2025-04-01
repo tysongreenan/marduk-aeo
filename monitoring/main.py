@@ -1160,12 +1160,41 @@ async def get_brand_analytics(brand_id: str, timeframe: str = "30d"):
 
 @app.get("/health")
 async def health_check():
-    """Health check endpoint"""
-    scheduler_jobs = len(scheduler.get_jobs())
+    """
+    Health check endpoint for monitoring system status.
+    Returns a 200 OK response if the system is functioning properly.
+    """
+    # Check if Supabase connection is working
+    try:
+        # Simple query to check if Supabase is accessible
+        supabase.table("health_check").limit(1).execute()
+        db_status = "ok"
+    except Exception as e:
+        logger.error(f"Database health check failed: {e}")
+        db_status = "error"
+    
+    # Check if Redis is working (if used)
+    redis_status = "not_configured"
+    try:
+        if redis:
+            await redis.ping()
+            redis_status = "ok"
+    except Exception as e:
+        logger.error(f"Redis health check failed: {e}")
+        redis_status = "error"
+    
+    # Check scheduler status
+    scheduler_status = "running" if scheduler.running else "stopped"
+    
     return {
-        "status": "healthy",
-        "active_jobs": scheduler_jobs,
-        "api_usage": api_limits.usage
+        "status": "ok",
+        "timestamp": datetime.now().isoformat(),
+        "version": "1.0.0",
+        "components": {
+            "database": db_status,
+            "redis": redis_status,
+            "scheduler": scheduler_status
+        }
     }
 
 # Add initialization endpoint

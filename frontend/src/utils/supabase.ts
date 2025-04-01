@@ -9,7 +9,7 @@ const bypassEnvCheck = import.meta.env.VITE_BYPASS_ENV_CHECK === 'true';
 const shouldUseMock = 
   (!supabaseUrl || !supabaseAnonKey) || // Missing credentials
   (supabaseUrl?.includes('your-project-ref') || supabaseAnonKey?.includes('your-anon-key')) || // Default placeholder values
-  !bypassEnvCheck; // Explicitly using mock in development
+  bypassEnvCheck; // Explicitly using mock in development
 
 if (shouldUseMock) {
   console.warn(
@@ -67,8 +67,11 @@ const createMockClient = () => {
           return { data: { session: mockSession, user: mockUser }, error: null };
         }
         
-        // For demo purposes, accept any credential in development
-        return { data: { session: mockSession, user: mockUser }, error: null };
+        // Return error for invalid credentials
+        return { 
+          data: { session: null, user: null }, 
+          error: { message: 'Invalid login credentials' } 
+        };
       },
       signUp: async (credentials: any) => {
         console.log('Mock signup:', credentials);

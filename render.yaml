@@ -1,18 +1,39 @@
 services:
   - type: web
+    name: ai-rank-booster-backend
+    env: python
+    plan: starter
+    buildCommand: pip install -r requirements.txt && chmod +x start_backend.sh
+    startCommand: ./start_backend.sh
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.9.0
+      - key: SUPABASE_URL
+        value: https://your-project-ref.supabase.co
+      - key: SUPABASE_KEY
+        value: your-supabase-key
+      - key: FRONTEND_DOMAIN
+        value: https://marduk-aeo.vercel.app
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        value: your-service-role-key
+      - key: CORS_ALLOW_ORIGINS
+        value: https://marduk-aeo.vercel.app,https://marduk-aeo-frontend.onrender.com
+      
+  - type: web
     name: marduk-aeo-frontend
     env: static
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: frontend/dist
     envVars:
       - key: VITE_API_URL
-        value: https://marduk-aeo-backend.onrender.com
+        value: https://ai-rank-booster-backend.onrender.com
       - key: VITE_SUPABASE_URL
         value: https://your-project-ref.supabase.co
       - key: VITE_SUPABASE_ANON_KEY
         value: your-anon-key
       - key: VITE_BYPASS_ENV_CHECK
-        value: "true"
+        value: "false"
     headers:
       - path: /*
         name: Cache-Control

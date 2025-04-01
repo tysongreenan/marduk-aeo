@@ -97,7 +97,7 @@ export default function HomePage() {
               border: '1px solid #fcd34d'
             }}>
               <p style={{fontSize: '0.875rem', color: '#92400e', textAlign: 'center'}}>
-                <strong>For Investors Demo:</strong> Use demo@example.com / password123 to instantly access the dashboard
+                <strong>For Real Company Setup:</strong> Create a <a href="https://supabase.com" style={{textDecoration: 'underline', color: '#92400e', fontWeight: 'bold'}}>Supabase</a> account and follow our <a href="https://github.com/tysongreenan/marduk-aeo/blob/main/SUPABASE_SETUP.md" style={{textDecoration: 'underline', color: '#92400e', fontWeight: 'bold'}}>setup guide</a>
               </p>
             </div>
           </div>
