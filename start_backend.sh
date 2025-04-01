@@ -58,13 +58,20 @@ else
     log "- FRONTEND_DOMAIN: NOT SET"
 fi
 
-# Change to monitoring directory
-cd monitoring
-log "Changed to monitoring directory"
-
 # Start the application with proper error handling
 log "Starting the application with gunicorn..."
 exec gunicorn main:app \
+    --workers 4 \
+    --worker-class uvicorn.workers.UvicornWorker \
+    --bind 0.0.0.0:$PORT \
+    --timeout 120 \
+    --log-level info \
+    --access-logfile - \
+    --error-logfile -
+
+# Use wsgi.py in the root directory instead
+log "Starting the application with gunicorn using WSGI entry point..."
+exec gunicorn wsgi:app \
     --workers 4 \
     --worker-class uvicorn.workers.UvicornWorker \
     --bind 0.0.0.0:$PORT \

@@ -3,8 +3,8 @@ services:
     name: ai-rank-booster-backend
     env: python
     plan: starter
-    buildCommand: pip install -r requirements.txt && chmod +x start_backend.sh
-    startCommand: ./start_backend.sh
+    buildCommand: pip install -r requirements.txt && chmod +x start_minimal.sh
+    startCommand: ./start_minimal.sh
     healthCheckPath: /health
     healthCheckTimeout: 60
     autoDeploy: false

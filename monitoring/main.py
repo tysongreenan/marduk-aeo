@@ -24,11 +24,11 @@ import statistics
 import secrets
 
 # Use relative imports instead of mixing absolute and relative imports
-from .usage_manager import UsageSettings, UsageManager, init_supabase_tables
-from .database import get_db, ensure_tables_exist
-from .dashboard import router as dashboard_router
-from .secure_data_api import router as secure_data_api_router
-from .ranking_api import router as ranking_api_router
+from monitoring.usage_manager import UsageSettings, UsageManager, init_supabase_tables
+from monitoring.database import get_db, ensure_tables_exist
+from monitoring.dashboard import router as dashboard_router
+from monitoring.secure_data_api import router as secure_data_api_router
+from monitoring.ranking_api import router as ranking_api_router
 
 # Load environment variables
 load_dotenv()
@@ -62,7 +62,7 @@ if not supabase_url or not supabase_key:
 
 try:
     # Try to use our helper function if available
-    from .fix_supabase import create_supabase_client
+    from monitoring.fix_supabase import create_supabase_client
     supabase = create_supabase_client()
 except ImportError:
     # Fall back to standard initialization

@@ -1,3 +1,10 @@
+"""
+Monitoring package for Marduk AEO.
+This package provides APIs for monitoring and analytics of AI query results.
+"""
+
+__version__ = "1.0.0"
+
 # Initialize monitoring package
 # This file makes Python treat the directory as a package
 
