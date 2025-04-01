@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Enable static output for better performance
-  output: 'export',
+  // Use standalone output for server rendering
+  output: 'standalone',
   
   // Disable ESLint during production builds to prevent failed deployments
   eslint: {
@@ -19,11 +19,6 @@ const nextConfig = {
   
   // Set trailing slash to be consistent
   trailingSlash: true,
-
-  // Disable image optimization (required for static export)
-  images: {
-    unoptimized: true,
-  },
 }
 
 module.exports = nextConfig 

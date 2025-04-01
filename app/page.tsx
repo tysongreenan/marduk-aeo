@@ -1,84 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { useAuth } from '../components/auth/AuthProvider'
+import { useState } from 'react'
 import Link from 'next/link'
 
 // Define the frontend URL for Vite app links
 const FRONTEND_URL = process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:5173';
 
 export default function HomePage() {
-  const router = useRouter()
-  const { user, loading, error, isEnvironmentReady } = useAuth()
-  const [showError, setShowError] = useState(false)
-
-  useEffect(() => {
-    // Only redirect if we're not loading and have a valid user
-    if (!loading && user) {
-      router.push('/dashboard')
-    }
-    
-    // Show error message after a delay if environment is not ready
-    if (!loading && !isEnvironmentReady) {
-      const timer = setTimeout(() => setShowError(true), 2000)
-      return () => clearTimeout(timer)
-    }
-  }, [loading, user, router, isEnvironmentReady])
-
-  // Loading state with improved messaging
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600 mx-auto mb-4"></div>
-          <h2 className="text-xl font-semibold text-gray-900">Loading...</h2>
-          <p className="mt-2 text-sm text-gray-600">Please wait while we set up your experience</p>
-        </div>
-      </div>
-    )
-  }
-
-  // Error state with helpful message
-  if (error || (showError && !isEnvironmentReady)) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-        <div className="max-w-md w-full text-center">
-          <div className="rounded-lg bg-white p-8 shadow-lg">
-            <h2 className="text-2xl font-bold text-red-600 mb-4">
-              {!isEnvironmentReady ? 'Configuration Required' : 'Something went wrong'}
-            </h2>
-            <p className="text-gray-600 mb-6">
-              {!isEnvironmentReady ? (
-                <>
-                  The application requires proper configuration to function. Please make sure all environment variables are set correctly.
-                  <br /><br />
-                  Required variables:
-                  <ul className="list-disc text-left pl-6 mt-2">
-                    <li>NEXT_PUBLIC_SUPABASE_URL</li>
-                    <li>NEXT_PUBLIC_SUPABASE_ANON_KEY</li>
-                  </ul>
-                </>
-              ) : (
-                error?.message || 'An unexpected error occurred. Please try again later.'
-              )}
-            </p>
-            <div className="mt-4">
-              <Link
-                href="https://github.com/tysongreenan/marduk-aeo#environment-variables"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary-600 hover:text-primary-700 font-medium"
-              >
-                View Setup Instructions →
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navigation */}
