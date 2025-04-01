@@ -2,15 +2,15 @@ services:
   - type: web
     name: marduk-aeo-frontend
     env: static
-    buildCommand: cd frontend && npm ci && npm run build
-    staticPublishPath: ./frontend/dist
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: frontend/dist
     envVars:
       - key: VITE_API_URL
-        value: https://api.your-domain.com # Update this to your actual API URL
+        value: https://marduk-aeo-backend.onrender.com
       - key: VITE_SUPABASE_URL
-        value: https://your-project-ref.supabase.co # Update with your Supabase project URL
+        value: https://your-project-ref.supabase.co
       - key: VITE_SUPABASE_ANON_KEY
-        value: your-anon-key # Update with your Supabase anon key
+        value: your-anon-key
       - key: VITE_BYPASS_ENV_CHECK
         value: "true"
     headers:

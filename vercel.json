@@ -4,9 +4,7 @@
   "outputDirectory": ".next",
   "installCommand": "npm install",
   "devCommand": "npm run dev",
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/" }
-  ],
+  "framework": "nextjs",
   "cleanUrls": true,
   "trailingSlash": true,
   "git": {
