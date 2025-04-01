@@ -5,7 +5,7 @@ import Link from 'next/link'
 import '../app/globals.css'
 
 // Define the frontend URL for Vite app links
-const FRONTEND_URL = process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:5173';
+const FRONTEND_URL = 'https://marduk-aeo-frontend.onrender.com';
 
 export default function HomePage() {
   return (
@@ -50,7 +50,7 @@ export default function HomePage() {
           <div style={{marginTop: '2rem', display: 'flex', justifyContent: 'center', gap: '0.75rem', flexWrap: 'wrap'}}>
             <div style={{boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)', borderRadius: '0.375rem'}}>
               <a
-                href={`${FRONTEND_URL}/signup`}
+                href={`${FRONTEND_URL}`}
                 style={{
                   display: 'flex', 
                   justifyContent: 'center', 
@@ -64,12 +64,12 @@ export default function HomePage() {
                   minWidth: '10rem'
                 }}
               >
-                Get Started
+                View Demo Dashboard
               </a>
             </div>
             <div style={{boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)', borderRadius: '0.375rem'}}>
               <a
-                href={`${FRONTEND_URL}/login`}
+                href="https://forms.gle/RkxkWNQDpS3YCb8WA"
                 style={{
                   display: 'flex', 
                   justifyContent: 'center', 
@@ -83,8 +83,22 @@ export default function HomePage() {
                   minWidth: '10rem'
                 }}
               >
-                Sign In
+                Request Access
               </a>
+            </div>
+            <div style={{
+              marginTop: '2rem', 
+              padding: '1rem', 
+              backgroundColor: '#fef3c7', 
+              borderRadius: '0.5rem',
+              width: '100%',
+              maxWidth: '32rem',
+              margin: '2rem auto',
+              border: '1px solid #fcd34d'
+            }}>
+              <p style={{fontSize: '0.875rem', color: '#92400e', textAlign: 'center'}}>
+                <strong>For Investors Demo:</strong> Use demo@example.com / password123 to instantly access the dashboard
+              </p>
             </div>
           </div>
         </div>

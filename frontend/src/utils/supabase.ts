@@ -19,13 +19,13 @@ if (shouldUseMock) {
 
 // Create a mock Supabase client
 const createMockClient = () => {
-  // Mock user data
+  // Mock user data for demo
   const mockUser = {
-    id: 'mock-user-id',
-    email: 'mock@example.com',
+    id: 'demo-user-123',
+    email: 'demo@example.com',
     user_metadata: {
-      organization_id: 'mock-org-id',
-      role: 'user'
+      organization_id: 'Acme Corporation',
+      role: 'Admin'
     }
   };
 
@@ -37,7 +37,7 @@ const createMockClient = () => {
     user: mockUser
   };
 
-  console.log('📣 USING MOCK CLIENT - you will see test data only');
+  console.log('📣 USING MOCK CLIENT - Demo mode activated');
 
   return {
     auth: {
@@ -50,8 +50,15 @@ const createMockClient = () => {
         error: null
       }),
       signInWithPassword: async ({ email, password }: { email: string; password: string }) => {
-        console.log(`Mock login: ${email} / ${password}`);
-        // Allow testing credentials to work
+        console.log(`Login attempt: ${email}`);
+        
+        // Accept demo credentials for investor testing
+        if (email === 'demo@example.com' && password === 'password123') {
+          console.log('Demo login successful!');
+          return { data: { session: mockSession, user: mockUser }, error: null };
+        }
+        
+        // Accept test credentials if configured
         const testEmail = import.meta.env.VITE_DASHBOARD_USERNAME;
         const testPassword = import.meta.env.VITE_DASHBOARD_PASSWORD;
         
