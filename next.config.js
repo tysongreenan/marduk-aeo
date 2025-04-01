@@ -17,11 +17,14 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
 
-  // Disable static generation for auth/protected pages
+  // Comment out static generation disabling for now to allow landing page to work
   experimental: {
-    // Disable static generation during build
-    disableStaticGeneration: true
-  }
+    // Allow static generation during build
+    disableStaticGeneration: false
+  },
+  
+  // Set trailing slash to be consistent
+  trailingSlash: true
 }
 
 module.exports = nextConfig 

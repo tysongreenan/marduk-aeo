@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -11,16 +11,38 @@ import {
   Stack,
   useToast,
   Text,
+  Alert,
+  AlertIcon,
+  Badge,
+  Flex,
+  Link,
+  Divider,
 } from '@chakra-ui/react';
 import { login } from '../api';
 import type { LoginProps } from '../types';
 
+const isMockMode = () => {
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+  const bypassEnvCheck = import.meta.env.VITE_BYPASS_ENV_CHECK === 'true';
+  
+  return (!supabaseUrl || !supabaseAnonKey || 
+          supabaseUrl.includes('your-project-ref') || 
+          supabaseAnonKey.includes('your-anon-key') || 
+          !bypassEnvCheck);
+};
+
 export default function Login({ onLoginSuccess }: LoginProps) {
-  const [email, setEmail] = useState('marketer@example.com'); // Pre-fill with test account
-  const [password, setPassword] = useState('password123'); // Pre-fill with test password
+  const [email, setEmail] = useState(import.meta.env.VITE_DASHBOARD_USERNAME || 'test@example.com');
+  const [password, setPassword] = useState(import.meta.env.VITE_DASHBOARD_PASSWORD || 'password123');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [mockMode, setMockMode] = useState(false);
   const toast = useToast();
+
+  useEffect(() => {
+    setMockMode(isMockMode());
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,50 +87,96 @@ export default function Login({ onLoginSuccess }: LoginProps) {
   };
 
   return (
-    <Container maxW="md" py={12}>
-      <Box p={8} boxShadow="lg" borderRadius="md" bg="white">
-        <Center mb={8}>
-          <Heading size="lg">Dashboard Login</Heading>
-        </Center>
-        
-        <form onSubmit={handleSubmit}>
-          <Stack spacing={4}>
-            <FormControl id="email" isRequired>
-              <FormLabel>Email</FormLabel>
-              <Input 
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </FormControl>
-            
-            <FormControl id="password" isRequired>
-              <FormLabel>Password</FormLabel>
-              <Input 
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </FormControl>
-            
-            {errorMessage && (
-              <Text color="red.500" mt={2}>
-                {errorMessage}
-              </Text>
-            )}
-            
-            <Button 
-              type="submit"
-              colorScheme="blue"
-              size="lg"
-              mt={6}
-              isLoading={isLoading}
-            >
-              Sign In
-            </Button>
-          </Stack>
-        </form>
-      </Box>
-    </Container>
+    <Box bg="gray.50" minH="100vh">
+      <Container maxW="md" py={12}>
+        <Flex direction="column" align="center" mb={8}>
+          <Heading size="xl" fontWeight="bold" color="blue.500" mb={2}>
+            Marduk AEO
+          </Heading>
+          <Text fontSize="lg" color="gray.600">
+            Sign in to your account
+          </Text>
+        </Flex>
+
+        <Box bg="white" p={8} boxShadow="md" borderRadius="md">
+          {mockMode && (
+            <Alert status="info" mb={6} borderRadius="md">
+              <AlertIcon />
+              <Box>
+                <Badge colorScheme="purple" mb={1}>MOCK MODE</Badge>
+                <Text fontSize="sm">
+                  Using test data. For real authentication, update your Supabase credentials in .env.
+                </Text>
+              </Box>
+            </Alert>
+          )}
+          
+          <form onSubmit={handleSubmit}>
+            <Stack spacing={6}>
+              <FormControl id="email">
+                <FormLabel>Email address</FormLabel>
+                <Input 
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  bg="gray.50"
+                  borderColor="gray.300"
+                  size="lg"
+                />
+                {mockMode && (
+                  <Text fontSize="xs" color="gray.500" mt={1}>
+                    Any email will work in mock mode
+                  </Text>
+                )}
+              </FormControl>
+              
+              <FormControl id="password">
+                <FormLabel>Password</FormLabel>
+                <Input 
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  bg="gray.50"
+                  borderColor="gray.300"
+                  size="lg"
+                />
+                {mockMode && (
+                  <Text fontSize="xs" color="gray.500" mt={1}>
+                    Any password will work in mock mode
+                  </Text>
+                )}
+              </FormControl>
+              
+              {errorMessage && (
+                <Alert status="error" borderRadius="md">
+                  <AlertIcon />
+                  {errorMessage}
+                </Alert>
+              )}
+              
+              <Button 
+                type="submit"
+                colorScheme="blue" 
+                size="lg"
+                w="full"
+                isLoading={isLoading}
+                loadingText="Signing in"
+              >
+                Sign in
+              </Button>
+              
+              <Divider />
+              
+              <Box textAlign="center">
+                <Text mb={2}>Don't have an account?</Text>
+                <Link color="blue.500" onClick={() => alert("Sign up would go here")}>
+                  Create an account
+                </Link>
+              </Box>
+            </Stack>
+          </form>
+        </Box>
+      </Container>
+    </Box>
   );
 } 

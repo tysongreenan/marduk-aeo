@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box,
   Container,
@@ -12,22 +12,78 @@ import {
   useColorModeValue,
   Button,
   Text,
+  Spinner,
+  Center,
+  useToast,
 } from '@chakra-ui/react';
 import Pricing from './Pricing';
+import { supabase } from '../utils/supabase';
+
+interface UserData {
+  email: string;
+  organization: string;
+  role: string;
+}
 
 const AccountPage: React.FC = () => {
   const [tabIndex, setTabIndex] = useState(0);
   const [showPricing, setShowPricing] = useState(false);
-  
-  // Static demo user data
-  const demoUser = {
-    email: 'demo@example.com',
-    organization: 'Acme Corporation',
-    role: 'Administrator'
-  };
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const toast = useToast();
   
   const bgColor = useColorModeValue('gray.50', 'gray.900');
   const headerBg = useColorModeValue('white', 'gray.800');
+  
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        setIsLoading(true);
+        
+        // Get user from Supabase
+        const { data: { user }, error } = await supabase.auth.getUser();
+        
+        if (error) {
+          throw error;
+        }
+        
+        if (user) {
+          // Format user data
+          setUserData({
+            email: user.email || 'No email available',
+            organization: user.user_metadata?.organization_id || 'Your Company',
+            role: user.user_metadata?.role || 'User'
+          });
+        } else {
+          // Fallback to demo data if no user found
+          setUserData({
+            email: 'demo@example.com',
+            organization: 'Acme Corporation', 
+            role: 'Administrator'
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        toast({
+          title: 'Error loading profile',
+          description: 'Could not load your profile information',
+          status: 'error',
+          duration: 3000,
+        });
+        
+        // Use demo data as fallback
+        setUserData({
+          email: 'demo@example.com',
+          organization: 'Acme Corporation',
+          role: 'Administrator'
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchUserData();
+  }, [toast]);
   
   const handleUpgrade = () => {
     setShowPricing(true);
@@ -53,6 +109,14 @@ const AccountPage: React.FC = () => {
     );
   }
   
+  if (isLoading) {
+    return (
+      <Center h="50vh">
+        <Spinner size="xl" />
+      </Center>
+    );
+  }
+  
   return (
     <Box bgColor={bgColor} minHeight="100vh" py={6}>
       <Container maxW="container.xl">
@@ -75,15 +139,15 @@ const AccountPage: React.FC = () => {
                 <Flex direction="column" gap={4}>
                   <Flex>
                     <Box width="150px" fontWeight="bold">Email:</Box>
-                    <Box>{demoUser.email}</Box>
+                    <Box>{userData?.email}</Box>
                   </Flex>
                   <Flex>
                     <Box width="150px" fontWeight="bold">Organization:</Box>
-                    <Box>{demoUser.organization}</Box>
+                    <Box>{userData?.organization}</Box>
                   </Flex>
                   <Flex>
                     <Box width="150px" fontWeight="bold">Role:</Box>
-                    <Box>{demoUser.role}</Box>
+                    <Box>{userData?.role}</Box>
                   </Flex>
                 </Flex>
               </Box>

@@ -28,6 +28,12 @@ const AuthContext = createContext<AuthContextType>({
 
 // Check if environment is properly configured
 const checkEnvironment = () => {
+  // Check for bypass flag for development
+  if (process.env.NEXT_PUBLIC_BYPASS_ENV_CHECK === 'true') {
+    console.log('Bypassing environment check for development')
+    return true
+  }
+
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 

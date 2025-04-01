@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '../components/auth/AuthProvider'
 import Link from 'next/link'
 
+// Define the frontend URL for Vite app links
+const FRONTEND_URL = process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:5173';
+
 export default function HomePage() {
   const router = useRouter()
   const { user, loading, error, isEnvironmentReady } = useAuth()
@@ -88,18 +91,18 @@ export default function HomePage() {
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <Link
-                href="/login"
+              <a
+                href={`${FRONTEND_URL}/login`}
                 className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
               >
                 Log in
-              </Link>
-              <Link
-                href="/signup"
+              </a>
+              <a
+                href={`${FRONTEND_URL}/signup`}
                 className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-md text-sm font-medium"
               >
                 Sign up
-              </Link>
+              </a>
             </div>
           </div>
         </div>
@@ -117,20 +120,20 @@ export default function HomePage() {
           </p>
           <div className="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
             <div className="rounded-md shadow">
-              <Link
-                href="/signup"
+              <a
+                href={`${FRONTEND_URL}/signup`}
                 className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 md:py-4 md:text-lg md:px-10"
               >
                 Get Started
-              </Link>
+              </a>
             </div>
             <div className="mt-3 rounded-md shadow sm:mt-0 sm:ml-3">
-              <Link
-                href="/login"
+              <a
+                href={`${FRONTEND_URL}/login`}
                 className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-primary-600 bg-white hover:bg-gray-50 md:py-4 md:text-lg md:px-10"
               >
                 Sign In
-              </Link>
+              </a>
             </div>
           </div>
         </div>

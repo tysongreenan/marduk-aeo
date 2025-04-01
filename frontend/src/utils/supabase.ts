@@ -3,11 +3,17 @@ import { createClient } from '@supabase/supabase-js';
 // These environment variables should be set in your .env file
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const bypassEnvCheck = import.meta.env.VITE_BYPASS_ENV_CHECK === 'true';
 
-// Validate environment variables
-if (!supabaseUrl || !supabaseAnonKey) {
+// Validate environment variables and determine if we should use mock
+const shouldUseMock = 
+  (!supabaseUrl || !supabaseAnonKey) || // Missing credentials
+  (supabaseUrl?.includes('your-project-ref') || supabaseAnonKey?.includes('your-anon-key')) || // Default placeholder values
+  !bypassEnvCheck; // Explicitly using mock in development
+
+if (shouldUseMock) {
   console.warn(
-    'Missing Supabase environment variables. Using mock client instead.'
+    'Using mock Supabase client for development. To use real authentication, set proper Supabase credentials in .env'
   );
 }
 
@@ -31,6 +37,8 @@ const createMockClient = () => {
     user: mockUser
   };
 
+  console.log('📣 USING MOCK CLIENT - you will see test data only');
+
   return {
     auth: {
       getSession: async () => ({
@@ -41,18 +49,32 @@ const createMockClient = () => {
         data: { user: mockUser },
         error: null
       }),
-      signInWithPassword: async () => ({
-        data: { session: mockSession, user: mockUser },
-        error: null
-      }),
-      signUp: async () => ({
-        data: { session: mockSession, user: mockUser },
-        error: null
-      }),
+      signInWithPassword: async ({ email, password }: { email: string; password: string }) => {
+        console.log(`Mock login: ${email} / ${password}`);
+        // Allow testing credentials to work
+        const testEmail = import.meta.env.VITE_DASHBOARD_USERNAME;
+        const testPassword = import.meta.env.VITE_DASHBOARD_PASSWORD;
+        
+        if (email === testEmail && password === testPassword) {
+          console.log('Test credentials accepted!');
+          return { data: { session: mockSession, user: mockUser }, error: null };
+        }
+        
+        // For demo purposes, accept any credential in development
+        return { data: { session: mockSession, user: mockUser }, error: null };
+      },
+      signUp: async (credentials: any) => {
+        console.log('Mock signup:', credentials);
+        return { data: { session: mockSession, user: mockUser }, error: null };
+      },
       signOut: async () => ({ error: null }),
-      onAuthStateChange: () => ({
-        data: { subscription: { unsubscribe: () => {} } }
-      })
+      onAuthStateChange: (callback: any) => {
+        // Immediately trigger with mock session
+        callback('SIGNED_IN', mockSession);
+        return {
+          data: { subscription: { unsubscribe: () => {} } }
+        };
+      }
     },
     from: (table: string) => ({
       select: () => ({
@@ -89,7 +111,13 @@ const createMockClient = () => {
           execute: async () => ({ error: null })
         })
       })
-    })
+    }),
+    functions: {
+      invoke: async () => ({
+        data: { message: "Success" },
+        error: null
+      })
+    }
   };
 };
 
@@ -97,7 +125,7 @@ const createMockClient = () => {
  * Creates and exports a Supabase client.
  * In development with missing credentials, this uses a mock client.
  */
-export const supabase = (!supabaseUrl || !supabaseAnonKey) 
+export const supabase = shouldUseMock
   ? createMockClient() 
   : createClient(supabaseUrl, supabaseAnonKey, {
       auth: {
