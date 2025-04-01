@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: marduk-aeo-frontend
+    env: static
+    buildCommand: cd frontend && npm ci && npm run build
+    staticPublishPath: ./frontend/dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://api.your-domain.com # Update this to your actual API URL
+      - key: VITE_SUPABASE_URL
+        value: https://your-project-ref.supabase.co # Update with your Supabase project URL
+      - key: VITE_SUPABASE_ANON_KEY
+        value: your-anon-key # Update with your Supabase anon key
+      - key: VITE_BYPASS_ENV_CHECK
+        value: "true"
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: public, max-age=0, must-revalidate
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html 
