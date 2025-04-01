@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Enable static output for better performance
-  output: 'standalone',
+  output: 'export',
   
   // Disable ESLint during production builds to prevent failed deployments
   eslint: {
@@ -16,15 +16,14 @@ const nextConfig = {
     // It's better to fix the type errors than to ignore them.
     ignoreBuildErrors: true,
   },
-
-  // Comment out static generation disabling for now to allow landing page to work
-  experimental: {
-    // Allow static generation during build
-    disableStaticGeneration: false
-  },
   
   // Set trailing slash to be consistent
-  trailingSlash: true
+  trailingSlash: true,
+
+  // Disable image optimization (required for static export)
+  images: {
+    unoptimized: true,
+  },
 }
 
 module.exports = nextConfig 
