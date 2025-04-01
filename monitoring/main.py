@@ -1162,9 +1162,11 @@ async def get_brand_analytics(brand_id: str, timeframe: str = "30d"):
 async def health_check():
     """
     Health check endpoint for monitoring system status.
-    Returns a 200 OK response if the system is functioning properly.
+    Always returns a 200 OK response to let Render know the service is running.
+    The detailed component statuses are included in the response but don't affect the HTTP status code.
     """
-    # Check if Supabase connection is working
+    # Check if Supabase connection is working, but don't let it fail the health check
+    db_status = "unknown"
     try:
         # Simple query to check if Supabase is accessible
         supabase.table("health_check").limit(1).execute()
@@ -1173,7 +1175,7 @@ async def health_check():
         logger.error(f"Database health check failed: {e}")
         db_status = "error"
     
-    # Check if Redis is working (if used)
+    # Check if Redis is working (if used), but don't let it fail the health check
     redis_status = "not_configured"
     try:
         if redis:
@@ -1183,9 +1185,7 @@ async def health_check():
         logger.error(f"Redis health check failed: {e}")
         redis_status = "error"
     
-    # Check scheduler status
-    scheduler_status = "running" if scheduler.running else "stopped"
-    
+    # Always return a 200 OK with status info
     return {
         "status": "ok",
         "timestamp": datetime.now().isoformat(),
@@ -1193,7 +1193,7 @@ async def health_check():
         "components": {
             "database": db_status,
             "redis": redis_status,
-            "scheduler": scheduler_status
+            "scheduler": "running" if scheduler.running else "stopped"
         }
     }
 

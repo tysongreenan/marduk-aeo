@@ -9,42 +9,39 @@ Answer Engine Optimization Platform for tracking brand visibility in AI-powered 
 - **Source Influence**: Analyze source influence on AI-generated answers
 - **Narrative Analysis**: Identify and shape narratives about your brand
 
-## Getting Started
+## Investor Demo Mode
 
-### Environment Variables
+The application is configured for easy demonstration:
 
-1. Copy `.env.example` to `.env.local`:
-```bash
-cp .env.example .env.local
-```
+1. Visit the landing page: https://marduk-aeo.vercel.app/
+2. Click "Login" to access the dashboard
+3. Use the pre-filled demo credentials:
+   - Email: `demo@example.com`
+   - Password: `password123`
 
-2. Update the values in `.env.local` with your Supabase credentials:
-   - `NEXT_PUBLIC_SUPABASE_URL`: Your Supabase project URL
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Public anon key from Supabase
-   - `SUPABASE_SERVICE_ROLE_KEY`: Service role key for server operations (keep secret!)
-
-You can find these credentials in your Supabase dashboard under Project Settings > API.
-
-### Installation
-
-```bash
-# Install dependencies
-npm install
-
-# Run the development server
-npm run dev
-```
-
-### Deployment
-
-For deployment on Vercel, add the environment variables to your project settings.
+No account creation required - just click "Sign in" with the pre-filled credentials.
 
 ## Technology Stack
 
-- Next.js for the frontend and API routes
-- Supabase for database, auth, and edge functions
+- Next.js for the landing page
+- Vite/React for the dashboard
 - TypeScript for type safety
-- Tailwind CSS for styling
+- ChakraUI for components
+- Backend API for data processing
+
+## Project Structure
+
+This project uses a dual-app architecture:
+
+1. **Next.js App (Root Directory)**: Landing page and public-facing content
+2. **Vite App (`/frontend` Directory)**: Main dashboard and authenticated functionality
+
+## Deployment
+
+The application is deployed to:
+- Landing Page: https://marduk-aeo.vercel.app/ (Vercel)
+- Dashboard: https://marduk-aeo-dashboard.vercel.app/ (Vercel)
+- Backend API: https://al-rank-booster-backend.onrender.com/ (Render)
 
 ## Local Development
 

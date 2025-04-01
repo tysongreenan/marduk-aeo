@@ -21,7 +21,7 @@ if (shouldUseMock) {
 const createMockClient = () => {
   // Mock user data for demo
   const mockUser = {
-    id: 'demo-user-123',
+    id: 'investor-demo-123',
     email: 'demo@example.com',
     user_metadata: {
       organization_id: 'Acme Corporation',
@@ -37,7 +37,7 @@ const createMockClient = () => {
     user: mockUser
   };
 
-  console.log('📣 USING MOCK CLIENT - Demo mode activated');
+  console.log('📣 INVESTOR DEMO MODE ACTIVE');
 
   return {
     auth: {
@@ -52,26 +52,15 @@ const createMockClient = () => {
       signInWithPassword: async ({ email, password }: { email: string; password: string }) => {
         console.log(`Login attempt: ${email}`);
         
-        // Accept demo credentials for investor testing
+        // Always accept demo@example.com with password123 for investor demos
         if (email === 'demo@example.com' && password === 'password123') {
-          console.log('Demo login successful!');
+          console.log('Investor demo login successful!');
           return { data: { session: mockSession, user: mockUser }, error: null };
         }
         
-        // Accept test credentials if configured
-        const testEmail = import.meta.env.VITE_DASHBOARD_USERNAME;
-        const testPassword = import.meta.env.VITE_DASHBOARD_PASSWORD;
-        
-        if (email === testEmail && password === testPassword) {
-          console.log('Test credentials accepted!');
-          return { data: { session: mockSession, user: mockUser }, error: null };
-        }
-        
-        // Return error for invalid credentials
-        return { 
-          data: { session: null, user: null }, 
-          error: { message: 'Invalid login credentials' } 
-        };
+        // Also accept any credentials during demo phase
+        console.log('Accepting any credentials for investor demo');
+        return { data: { session: mockSession, user: mockUser }, error: null };
       },
       signUp: async (credentials: any) => {
         console.log('Mock signup:', credentials);

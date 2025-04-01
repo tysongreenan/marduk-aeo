@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   Box,
   Button,
@@ -21,28 +21,13 @@ import {
 import { login } from '../api';
 import type { LoginProps } from '../types';
 
-const isMockMode = () => {
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-  const bypassEnvCheck = import.meta.env.VITE_BYPASS_ENV_CHECK === 'true';
-  
-  return (!supabaseUrl || !supabaseAnonKey || 
-          supabaseUrl.includes('your-project-ref') || 
-          supabaseAnonKey.includes('your-anon-key') || 
-          !bypassEnvCheck);
-};
-
 export default function Login({ onLoginSuccess }: LoginProps) {
-  const [email, setEmail] = useState(import.meta.env.VITE_DASHBOARD_USERNAME || 'test@example.com');
-  const [password, setPassword] = useState(import.meta.env.VITE_DASHBOARD_PASSWORD || 'password123');
+  const [email, setEmail] = useState('demo@example.com');
+  const [password, setPassword] = useState('password123');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [mockMode, setMockMode] = useState(false);
+  const [mockMode, setMockMode] = useState(true);
   const toast = useToast();
-
-  useEffect(() => {
-    setMockMode(isMockMode());
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,17 +84,15 @@ export default function Login({ onLoginSuccess }: LoginProps) {
         </Flex>
 
         <Box bg="white" p={8} boxShadow="md" borderRadius="md">
-          {mockMode && (
-            <Alert status="info" mb={6} borderRadius="md">
-              <AlertIcon />
-              <Box>
-                <Badge colorScheme="purple" mb={1}>MOCK MODE</Badge>
-                <Text fontSize="sm">
-                  Using test data. For real authentication, update your Supabase credentials in .env.
-                </Text>
-              </Box>
-            </Alert>
-          )}
+          <Alert status="info" mb={6} borderRadius="md">
+            <AlertIcon />
+            <Box>
+              <Badge colorScheme="green" mb={1}>INVESTOR DEMO</Badge>
+              <Text fontSize="sm">
+                Demo credentials are pre-filled. Just click "Sign in" to continue.
+              </Text>
+            </Box>
+          </Alert>
           
           <form onSubmit={handleSubmit}>
             <Stack spacing={6}>
@@ -123,11 +106,9 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                   borderColor="gray.300"
                   size="lg"
                 />
-                {mockMode && (
-                  <Text fontSize="xs" color="gray.500" mt={1}>
-                    Any email will work in mock mode
-                  </Text>
-                )}
+                <Text fontSize="xs" color="gray.500" mt={1}>
+                  Pre-filled with demo account
+                </Text>
               </FormControl>
               
               <FormControl id="password">
@@ -140,11 +121,9 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                   borderColor="gray.300"
                   size="lg"
                 />
-                {mockMode && (
-                  <Text fontSize="xs" color="gray.500" mt={1}>
-                    Any password will work in mock mode
-                  </Text>
-                )}
+                <Text fontSize="xs" color="gray.500" mt={1}>
+                  Pre-filled with demo password
+                </Text>
               </FormControl>
               
               {errorMessage && (
@@ -164,15 +143,6 @@ export default function Login({ onLoginSuccess }: LoginProps) {
               >
                 Sign in
               </Button>
-              
-              <Divider />
-              
-              <Box textAlign="center">
-                <Text mb={2}>Don't have an account?</Text>
-                <Link color="blue.500" onClick={() => alert("Sign up would go here")}>
-                  Create an account
-                </Link>
-              </Box>
             </Stack>
           </form>
         </Box>

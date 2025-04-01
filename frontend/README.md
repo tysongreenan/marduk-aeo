@@ -2,19 +2,14 @@
 
 This is the main dashboard application for the Marduk AEO platform.
 
-## Real Authentication Setup
+## Investor Demo Mode
 
-By default, the application runs in mock mode with fake data. To use real authentication and data:
+The application is configured to run in investor demo mode with pre-filled credentials:
 
-1. Create a [Supabase](https://supabase.com) account and project
-2. Get your project URL and anonymous key from the Supabase dashboard
-3. Edit the `.env` file in this directory:
+- Email: `demo@example.com` 
+- Password: `password123`
 
-```
-VITE_SUPABASE_URL=https://your-actual-project-ref.supabase.co
-VITE_SUPABASE_ANON_KEY=your-actual-anon-key
-VITE_BYPASS_ENV_CHECK=true
-```
+Simply click "Sign in" to access the dashboard.
 
 ## Development Mode
 
@@ -26,20 +21,11 @@ npm install
 npm run dev
 ```
 
-## Using Test Credentials
-
-When using mock mode, you can log in with these test credentials:
-
-- Email: `test@example.com` 
-- Password: `password123`
-
-You can change these in the `.env` file.
-
 ## Project Structure
 
 - `/src` - Source code
   - `/components` - UI components
-  - `/utils` - Utility functions including Supabase client
+  - `/utils` - Utility functions and authentication
   - `/contexts` - React context providers
 
 ## Deployment

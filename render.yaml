@@ -6,6 +6,8 @@ services:
     buildCommand: pip install -r requirements.txt && chmod +x start_backend.sh
     startCommand: ./start_backend.sh
     healthCheckPath: /health
+    healthCheckTimeout: 60
+    autoDeploy: false
     envVars:
       - key: PYTHON_VERSION
         value: 3.9.0
@@ -19,6 +21,10 @@ services:
         value: your-service-role-key
       - key: CORS_ALLOW_ORIGINS
         value: https://marduk-aeo.vercel.app,https://marduk-aeo-frontend.onrender.com
+      - key: GUNICORN_WORKER_TIMEOUT 
+        value: "120"
+      - key: ENVIRONMENT
+        value: "production"
       
   - type: web
     name: marduk-aeo-frontend
