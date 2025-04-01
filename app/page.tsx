@@ -2,32 +2,33 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import '../app/globals.css'
 
 // Define the frontend URL for Vite app links
 const FRONTEND_URL = process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:5173';
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Navigation */}
-      <nav className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex">
-              <div className="flex-shrink-0 flex items-center">
-                <span className="text-2xl font-bold text-primary-600">Marduk AEO</span>
+      <nav style={{backgroundColor: 'white', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'}}>
+        <div style={{maxWidth: '80rem', margin: '0 auto', padding: '0 1rem'}}>
+          <div style={{display: 'flex', justifyContent: 'space-between', height: '4rem', alignItems: 'center'}}>
+            <div style={{display: 'flex'}}>
+              <div style={{display: 'flex', alignItems: 'center'}}>
+                <span style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#1c64f2'}}>Marduk AEO</span>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
+            <div style={{display: 'flex', alignItems: 'center', gap: '1rem'}}>
               <a
                 href={`${FRONTEND_URL}/login`}
-                className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                style={{color: '#4b5563', padding: '0.5rem 0.75rem', borderRadius: '0.375rem', fontSize: '0.875rem', fontWeight: '500', textDecoration: 'none'}}
               >
                 Log in
               </a>
               <a
                 href={`${FRONTEND_URL}/signup`}
-                className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                style={{backgroundColor: '#1c64f2', color: 'white', padding: '0.5rem 1rem', borderRadius: '0.375rem', fontSize: '0.875rem', fontWeight: '500', textDecoration: 'none'}}
               >
                 Sign up
               </a>
@@ -37,28 +38,50 @@ export default function HomePage() {
       </nav>
 
       {/* Hero Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-center">
-          <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
-            <span className="block">Track Your Brand Visibility</span>
-            <span className="block text-primary-600">in AI Search Results</span>
+      <div style={{maxWidth: '80rem', margin: '0 auto', padding: '3rem 1rem'}}>
+        <div style={{textAlign: 'center'}}>
+          <h1 style={{fontSize: '2.5rem', fontWeight: '800', color: '#111827', lineHeight: '1.2'}}>
+            <span style={{display: 'block'}}>Track Your Brand Visibility</span>
+            <span style={{display: 'block', color: '#1c64f2'}}>in AI Search Results</span>
           </h1>
-          <p className="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
+          <p style={{marginTop: '1rem', maxWidth: '28rem', margin: '0 auto', color: '#6b7280', fontSize: '1.125rem', lineHeight: '1.75rem'}}>
             Monitor and analyze how your brand appears in AI-powered search results. Get insights, track mentions, and stay ahead of the competition.
           </p>
-          <div className="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
-            <div className="rounded-md shadow">
+          <div style={{marginTop: '2rem', display: 'flex', justifyContent: 'center', gap: '0.75rem', flexWrap: 'wrap'}}>
+            <div style={{boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)', borderRadius: '0.375rem'}}>
               <a
                 href={`${FRONTEND_URL}/signup`}
-                className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 md:py-4 md:text-lg md:px-10"
+                style={{
+                  display: 'flex', 
+                  justifyContent: 'center', 
+                  alignItems: 'center', 
+                  padding: '0.75rem 2rem', 
+                  borderRadius: '0.375rem', 
+                  backgroundColor: '#1c64f2', 
+                  color: 'white', 
+                  fontWeight: '500',
+                  textDecoration: 'none',
+                  minWidth: '10rem'
+                }}
               >
                 Get Started
               </a>
             </div>
-            <div className="mt-3 rounded-md shadow sm:mt-0 sm:ml-3">
+            <div style={{boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)', borderRadius: '0.375rem'}}>
               <a
                 href={`${FRONTEND_URL}/login`}
-                className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-primary-600 bg-white hover:bg-gray-50 md:py-4 md:text-lg md:px-10"
+                style={{
+                  display: 'flex', 
+                  justifyContent: 'center', 
+                  alignItems: 'center', 
+                  padding: '0.75rem 2rem', 
+                  borderRadius: '0.375rem', 
+                  backgroundColor: 'white', 
+                  color: '#1c64f2', 
+                  fontWeight: '500',
+                  textDecoration: 'none',
+                  minWidth: '10rem'
+                }}
               >
                 Sign In
               </a>
@@ -68,10 +91,10 @@ export default function HomePage() {
       </div>
 
       {/* Footer */}
-      <footer className="bg-white mt-auto">
-        <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 md:flex md:items-center md:justify-between lg:px-8">
-          <div className="mt-8 md:mt-0">
-            <p className="text-center text-base text-gray-400">
+      <footer style={{backgroundColor: 'white', marginTop: 'auto'}}>
+        <div style={{maxWidth: '80rem', margin: '0 auto', padding: '3rem 1rem', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+          <div>
+            <p style={{textAlign: 'center', fontSize: '0.875rem', color: '#9ca3af'}}>
               &copy; {new Date().getFullYear()} Marduk AEO. All rights reserved.
             </p>
           </div>
